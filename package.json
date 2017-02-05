@@ -1,0 +1,35 @@
+{
+  "name": "govnokoderbot",
+  "version": "0.9.0",
+  "description": "The chat bot for Telegram",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/beshkenadze/vrbot.git"
+  },
+  "keywords": [
+    "bot",
+    "chat",
+    "telegram"
+  ],
+  "author": "Aleksandr Beshkenadze <beshkenadze@gmail.com> (http://beshkenadze.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/beshkenadze/vrbot/issues"
+  },
+  "homepage": "https://github.com/beshkenadze/vrbot#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "firebase": "^3.5.2",
+    "machina": "^2.0.0",
+    "moment": "^2.15.2",
+    "node-telegram-bot-api": "^0.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^6.0.46"
+  }
+}

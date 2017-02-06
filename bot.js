@@ -26,7 +26,10 @@ var winnersRef = db.ref("winners");
 
 var machina = require('machina');
 var moment = require('moment');
-var today = moment().format("YYYY-MM-DD");
+
+var today = function () {
+	return moment().format("YYYY-MM-DD");
+};
 var commandSignal = new machina.Fsm({
 	initialize: function (options) {
 		// your setup code goes here...
@@ -69,7 +72,7 @@ var commandSignal = new machina.Fsm({
 							winner = snapshot.val()[rand];
 							console.log('winner is %s', winner.username);
 
-							winnersRef.child(today).set(winner, function (error) {
+							winnersRef.child(today()).set(winner, function (error) {
 								if (error) {
 									console.error("Data could not be saved." + error);
 								} else {
@@ -90,14 +93,14 @@ var commandSignal = new machina.Fsm({
 				findUserInRef(usersRef, user, function (exists) {
 					console.log("exists:" + exists);
 					if (exists) {
-						botMessage(msg.chat.id, '<b>Эй!</b> Ты уже участвуешь в игре <b>"Говнокодер Дня"</b>!');
+						botMessage(msg.chat.id, '<b>Эй, @' + user.username + '!</b> Ты уже участвуешь в игре <b>"Говнокодер Дня"</b>!');
 					} else {
 						usersRef.push(user, function (error) {
 							if (error) {
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data saved successfully.");
-								botMessage(msg.chat.id, '<b>OK!</b> Ты теперь участвуешь в игре <b>"Говнокодер Дня"</b>!');
+								botMessage(msg.chat.id, '<b>OK, @' + user.username + '!</b> Ты теперь участвуешь в игре <b>"Говнокодер Дня"</b>!');
 							}
 						});
 					}
@@ -137,7 +140,7 @@ var findTodayWinner = function (callback) {
 		};
 	}
 
-	winnersRef.child(today).once('value', function (snapshot) {
+	winnersRef.child(today()).once('value', function (snapshot) {
 		callback(snapshot.val());
 	});
 };

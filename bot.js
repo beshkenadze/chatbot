@@ -1,10 +1,11 @@
 require('dotenv').config();
 
+var Phrases = require('./phrases');
 var TelegramBot = require('node-telegram-bot-api');
 var botToken = process.env.BOT_TOKEN || 'some-default-token';
 var firebaseApiKey = process.env.FIREBASE_API_KEY || 'some-default-key';
 var firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'some-default-project-id';
-
+var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';;
 // Setup polling way
 var bot = new TelegramBot(botToken, {polling: true});
 var firebase = require("firebase");
@@ -93,14 +94,14 @@ var commandSignal = new machina.Fsm({
 				findUserInRef(usersRef, user, function (exists) {
 					console.log("exists:" + exists);
 					if (exists) {
-						botMessage(msg.chat.id, '<b>Эй, @' + user.username + '!</b> Ты уже участвуешь в игре <b>"Говнокодер Дня"</b>!');
+						botMessage(msg.chat.id, Phrases.alreadyRegister({username:user.username, game: GAME_NAME}));
 					} else {
 						usersRef.push(user, function (error) {
 							if (error) {
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data saved successfully.");
-								botMessage(msg.chat.id, '<b>OK, @' + user.username + '!</b> Ты теперь участвуешь в игре <b>"Говнокодер Дня"</b>!');
+								botMessage(msg.chat.id, Phrases.register({username:user.username, game: GAME_NAME}));
 							}
 						});
 					}
@@ -115,7 +116,7 @@ var commandSignal = new machina.Fsm({
 	}
 });
 var winnerMessage = function (to, user) {
-	botMessage(to, 'Ого, вы посмотрите только! А <b>Говнокодер Дня</b> то - @' + user.username);
+	botMessage(to, Phrases.winner({username:user.username, game: GAME_NAME}));
 };
 var botMessage = function (to, message) {
 	console.log(message);

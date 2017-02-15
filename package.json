@@ -25,9 +25,11 @@
   "dependencies": {
     "dotenv": "^4.0.0",
     "firebase": "^3.5.2",
+    "js-yaml": "^3.8.1",
     "machina": "^2.0.0",
     "moment": "^2.15.2",
-    "node-telegram-bot-api": "^0.24.0"
+    "node-telegram-bot-api": "^0.24.0",
+    "sprintf": "^0.1.5"
   },
   "devDependencies": {
     "@types/node": "^6.0.46"

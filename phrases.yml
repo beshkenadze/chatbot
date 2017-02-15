@@ -1,0 +1,9 @@
+winner:
+  - 'А <b>%(game)s</b> то – @%(username)s'
+  - 'ВЖУХ И <b>%(game)s</b>, @%(username)s'
+register:
+  - '<b>OK, %(username)s!</b> Ты теперь участвуешь в игре <b>"%(game)s"</b>!'
+  - 'У нас новый участник <b>%(username)s!</b> и он участвует в игре <b>"%(game)s"</b>!'
+already_register:
+  - 'Эй, <b>@%(username)s!</b> Ты уже участвуешь в игре <b>"%(game)s"</b>!'
+  - '<b>@%(username)s</b>, тебе уже забронировали место в игре <b>"%(game)s"</b>!'

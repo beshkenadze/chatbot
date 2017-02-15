@@ -1,6 +1,8 @@
 winner:
   - 'А <b>%(game)s</b> то – @%(username)s'
   - 'ВЖУХ И <b>%(game)s</b>, @%(username)s'
+already_winner:
+  - 'У "%(game)s" у нас сегодня <b>"%(username)s"</b>!'
 register:
   - '<b>OK, %(username)s!</b> Ты теперь участвуешь в игре <b>"%(game)s"</b>!'
   - 'У нас новый участник <b>%(username)s!</b> и он участвует в игре <b>"%(game)s"</b>!'

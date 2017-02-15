@@ -36,6 +36,9 @@ module.exports = {
 	winner: function (object) {
 		return this.getString('winner', object);
 	},
+	alreadyWinner: function (object) {
+		return this.getString('already_winner', object);
+	},
 	register: function (object) {
 		return this.getString('register', object);
 	},

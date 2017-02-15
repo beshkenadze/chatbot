@@ -84,7 +84,7 @@ var commandSignal = new machina.Fsm({
 							});
 						});
 					} else {
-						winnerMessage(msg.chat.id, winner);
+						winnerMessage(msg.chat.id, winner, true);
 					}
 				});
 
@@ -115,8 +115,9 @@ var commandSignal = new machina.Fsm({
 		this.handle(args, cmd);
 	}
 });
-var winnerMessage = function (to, user) {
-	botMessage(to, Phrases.winner({username:user.username, game: GAME_NAME}));
+var winnerMessage = function (to, user, already) {
+	var data = {username:user.username, game: GAME_NAME};
+	botMessage(to, already ? Phrases.alreadyWinner(data) : Phrases.winner(data));
 };
 var botMessage = function (to, message) {
 	console.log(message);

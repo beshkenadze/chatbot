@@ -42,7 +42,13 @@ module.exports = {
 	register: function (object) {
 		return this.getString('register', object);
 	},
+	unregister: function (object) {
+		return this.getString('unregister', object);
+	},
 	alreadyRegister: function (object) {
 		return this.getString('already_register', object);
+	},
+	alreadyUnregister: function (object) {
+		return this.getString('already_unregister', object);
 	}
 };

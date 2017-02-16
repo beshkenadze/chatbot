@@ -5,7 +5,8 @@ var TelegramBot = require('node-telegram-bot-api');
 var botToken = process.env.BOT_TOKEN || 'some-default-token';
 var firebaseApiKey = process.env.FIREBASE_API_KEY || 'some-default-key';
 var firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'some-default-project-id';
-var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';;
+var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';
+;
 // Setup polling way
 var bot = new TelegramBot(botToken, {polling: true});
 var firebase = require("firebase");
@@ -49,7 +50,8 @@ var commandSignal = new machina.Fsm({
 				if (msg) {
 					botMessage(msg.chat.id, '<b>Список комманд!</b> \n' +
 					  '/register – регистрация  \n' +
-					  '/round – запустить раунд');
+					  '/round – запустить раунд \n' +
+					  '/unregister – перестать участвовать');
 				}
 			},
 			"count": function (msg) {
@@ -65,12 +67,14 @@ var commandSignal = new machina.Fsm({
 				findTodayWinner(function (winner) {
 					if (winner === null) {
 						usersRef.once("value", function (snapshot) {
+							if(snapshot === null) return;
 							var keys = [];
 							for (var userKey in snapshot.val()) {
 								keys.push(userKey);
 							}
 							var rand = keys[Math.floor(Math.random() * keys.length)];
 							winner = snapshot.val()[rand];
+
 							console.log('winner is %s', winner.username);
 
 							winnersRef.child(today()).set(winner, function (error) {
@@ -91,23 +95,51 @@ var commandSignal = new machina.Fsm({
 			},
 			"register": function (msg) {
 				var user = msg.from;
-				findUserInRef(usersRef, user, function (exists) {
+				findUser(usersRef, user, function (exists) {
 					console.log("exists:" + exists);
 					if (exists) {
-						botMessage(msg.chat.id, Phrases.alreadyRegister({username:user.username, game: GAME_NAME}));
+						botMessage(msg.chat.id, Phrases.alreadyRegister({username: user.username, game: GAME_NAME}));
 					} else {
 						usersRef.push(user, function (error) {
 							if (error) {
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data saved successfully.");
-								botMessage(msg.chat.id, Phrases.register({username:user.username, game: GAME_NAME}));
+								botMessage(msg.chat.id, Phrases.register({username: user.username, game: GAME_NAME}));
 							}
 						});
 					}
 				});
 				console.log("hello %s", user.id);
 			},
+			"unregister": function (msg) {
+				var user = msg.from;
+				findUser(usersRef, user, function (exists, snapshot) {
+					console.log("exists:" + exists);
+					if (exists) {
+						removeSnapshotFromRef(snapshot, usersRef, function (error) {
+							if (error) {
+								console.error("Data could not be saved." + error);
+							} else {
+								console.log("Data updated successfully.");
+								botMessage(msg.chat.id, Phrases.unregister({username: user.username, game: GAME_NAME}));
+							}
+						});
+						// ref.remove(function (error) {
+						// 	if (error) {
+						// 		console.error("Data could not be saved." + error);
+						// 	} else {
+						// 		console.log("Data updated successfully.");
+						// 		botMessage(msg.chat.id, Phrases.unregister({username: user.username, game: GAME_NAME}));
+						// 	}
+						// });
+					} else {
+						// botMessage(msg.chat.id, Phrases.alreadyUnregister({username: user.username, game: GAME_NAME}));
+					}
+				});
+				console.log("hello %s", user.id);
+			},
+
 
 		},
 	},
@@ -116,7 +148,7 @@ var commandSignal = new machina.Fsm({
 	}
 });
 var winnerMessage = function (to, user, already) {
-	var data = {username:user.username, game: GAME_NAME};
+	var data = {username: user.username, game: GAME_NAME};
 	botMessage(to, already ? Phrases.alreadyWinner(data) : Phrases.winner(data));
 };
 var botMessage = function (to, message) {
@@ -125,17 +157,27 @@ var botMessage = function (to, message) {
 		parse_mode: "HTML"
 	});
 };
-var findUserInRef = function (dbRef, user, callback) {
+var findUser = function (dbRef, user, callback) {
 	if (typeof callback === "undefined") {
 		callback = function () {
 		};
 	}
 
 	dbRef.orderByChild('id').equalTo(user.id).once('value', function (snapshot) {
-		var exists = (snapshot.val() !== null);
-		callback(exists);
+		callback(snapshot !== null ? snapshot.exists() : false, snapshot);
 	});
 };
+
+var removeSnapshotFromRef = function (snapshot, ref, cb) {
+	if (typeof cb === "undefined") {
+		cb = function () {
+		};
+	}
+
+	var refPath = Object.keys(snapshot.val())[0];
+	ref.child(refPath).remove(cb);
+};
+
 var findTodayWinner = function (callback) {
 	if (typeof callback === "undefined") {
 		callback = function () {
@@ -145,6 +187,13 @@ var findTodayWinner = function (callback) {
 	winnersRef.child(today()).once('value', function (snapshot) {
 		callback(snapshot.val());
 	});
+};
+var unregisterUser = function (dbRef, user, callback) {
+	if (typeof callback === "undefined") {
+		callback = function () {
+		};
+	}
+	dbRef.orderByChild('id').equalTo(user.id).remove(callback);
 };
 // Matches /echo [whatever]
 bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {

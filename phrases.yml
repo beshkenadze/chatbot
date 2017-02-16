@@ -1,11 +1,16 @@
 winner:
-  - 'А <b>%(game)s</b> то – @%(username)s'
   - 'ВЖУХ И <b>%(game)s</b>, @%(username)s'
+  - '@%(username)s <b>%(game)s</b> ¯\_ツ_/¯'
 already_winner:
   - 'У "%(game)s" у нас сегодня <b>"%(username)s"</b>!'
 register:
-  - '<b>OK, %(username)s!</b> Ты теперь участвуешь в игре <b>"%(game)s"</b>!'
   - 'У нас новый участник <b>%(username)s!</b> и он участвует в игре <b>"%(game)s"</b>!'
+  - 'Из Телеграмма регистрируются только быки и пидорасы. Рогов у тебя, @%(username)s, нет — так что выбор у тебя невелик.'
+unregister:
+  - 'Ну и вали, <b>%(username)s</b>!'
+  - 'Нас покинул <b>%(username)s</b>!'
+already_unregister:
+  - '@%(username)s, ты уже вышел из игры <b>"%(game)s"</b>!'
 already_register:
-  - 'Эй, <b>@%(username)s!</b> Ты уже участвуешь в игре <b>"%(game)s"</b>!'
+  - 'Эй, <b>@%(username)s!</b> ты уже участвуешь в игре <b>"%(game)s"</b>!'
   - '<b>@%(username)s</b>, тебе уже забронировали место в игре <b>"%(game)s"</b>!'

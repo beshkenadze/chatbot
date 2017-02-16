@@ -32,6 +32,9 @@ var moment = require('moment');
 var today = function () {
 	return moment().format("YYYY-MM-DD");
 };
+var getUserNameFromUser = function (user) {
+	return user.username || (user.first_name + " " + user.last_name).trim();
+};
 var commandSignal = new machina.Fsm({
 	initialize: function (options) {
 		// your setup code goes here...
@@ -67,7 +70,7 @@ var commandSignal = new machina.Fsm({
 				findTodayWinner(function (winner) {
 					if (winner === null) {
 						usersRef.once("value", function (snapshot) {
-							if(snapshot === null) return;
+							if (snapshot === null) return;
 							var keys = [];
 							for (var userKey in snapshot.val()) {
 								keys.push(userKey);
@@ -98,14 +101,20 @@ var commandSignal = new machina.Fsm({
 				findUser(usersRef, user, function (exists) {
 					console.log("exists:" + exists);
 					if (exists) {
-						botMessage(msg.chat.id, Phrases.alreadyRegister({username: user.username, game: GAME_NAME}));
+						botMessage(msg.chat.id, Phrases.alreadyRegister({
+							username: getUserNameFromUser(user),
+							game: GAME_NAME
+						}));
 					} else {
 						usersRef.push(user, function (error) {
 							if (error) {
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data saved successfully.");
-								botMessage(msg.chat.id, Phrases.register({username: user.username, game: GAME_NAME}));
+								botMessage(msg.chat.id, Phrases.register({
+									username: getUserNameFromUser(user),
+									game: GAME_NAME
+								}));
 							}
 						});
 					}
@@ -122,7 +131,7 @@ var commandSignal = new machina.Fsm({
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data updated successfully.");
-								botMessage(msg.chat.id, Phrases.unregister({username: user.username, game: GAME_NAME}));
+								botMessage(msg.chat.id, Phrases.unregister({username: getUserNameFromUser(user), game: GAME_NAME}));
 							}
 						});
 						// ref.remove(function (error) {
@@ -148,7 +157,7 @@ var commandSignal = new machina.Fsm({
 	}
 });
 var winnerMessage = function (to, user, already) {
-	var data = {username: user.username, game: GAME_NAME};
+	var data = {username: getUserNameFromUser(user), game: GAME_NAME};
 	botMessage(to, already ? Phrases.alreadyWinner(data) : Phrases.winner(data));
 };
 var botMessage = function (to, message) {

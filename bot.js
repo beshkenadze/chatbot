@@ -8,7 +8,9 @@ var firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'some-default-project
 var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';
 ;
 // Setup polling way
-var bot = new TelegramBot(botToken, {polling: true});
+var bot = new TelegramBot(botToken, {
+	polling: true
+});
 var firebase = require("firebase");
 
 
@@ -33,7 +35,7 @@ var today = function () {
 	return moment().format("YYYY-MM-DD");
 };
 var getUserNameFromUser = function (user) {
-	return user.username || (user.first_name + " " + user.last_name).trim();
+	return user.username || (user.first_name || "" + " " + user.last_name || "").trim();
 };
 var commandSignal = new machina.Fsm({
 	initialize: function (options) {
@@ -75,6 +77,10 @@ var commandSignal = new machina.Fsm({
 							for (var userKey in snapshot.val()) {
 								keys.push(userKey);
 							}
+							if (keys.length <= 0) {
+								botMessage(msg.chat.id, Phrases.getString("empty_participant"), msg.message_id)
+								return;
+							}
 							var rand = keys[Math.floor(Math.random() * keys.length)];
 							winner = snapshot.val()[rand];
 
@@ -104,7 +110,7 @@ var commandSignal = new machina.Fsm({
 						botMessage(msg.chat.id, Phrases.alreadyRegister({
 							username: getUserNameFromUser(user),
 							game: GAME_NAME
-						}));
+						}), msg.message_id);
 					} else {
 						usersRef.push(user, function (error) {
 							if (error) {
@@ -114,12 +120,11 @@ var commandSignal = new machina.Fsm({
 								botMessage(msg.chat.id, Phrases.register({
 									username: getUserNameFromUser(user),
 									game: GAME_NAME
-								}));
+								}), msg.message_id);
 							}
 						});
 					}
 				});
-				console.log("hello %s", user.id);
 			},
 			"unregister": function (msg) {
 				var user = msg.from;
@@ -131,19 +136,17 @@ var commandSignal = new machina.Fsm({
 								console.error("Data could not be saved." + error);
 							} else {
 								console.log("Data updated successfully.");
-								botMessage(msg.chat.id, Phrases.unregister({username: getUserNameFromUser(user), game: GAME_NAME}));
+								botMessage(msg.chat.id, Phrases.unregister({
+									username: getUserNameFromUser(user),
+									game: GAME_NAME
+								}), msg.message_id);
 							}
 						});
-						// ref.remove(function (error) {
-						// 	if (error) {
-						// 		console.error("Data could not be saved." + error);
-						// 	} else {
-						// 		console.log("Data updated successfully.");
-						// 		botMessage(msg.chat.id, Phrases.unregister({username: user.username, game: GAME_NAME}));
-						// 	}
-						// });
 					} else {
-						// botMessage(msg.chat.id, Phrases.alreadyUnregister({username: user.username, game: GAME_NAME}));
+						botMessage(msg.chat.id, Phrases.alreadyUnregister({
+							username: getUserNameFromUser(user),
+							game: GAME_NAME
+						}), msg.message_id);
 					}
 				});
 				console.log("hello %s", user.id);
@@ -157,12 +160,13 @@ var commandSignal = new machina.Fsm({
 	}
 });
 var winnerMessage = function (to, user, already) {
-	var data = {username: getUserNameFromUser(user), game: GAME_NAME};
+	var data = {username: (already ? '' : '@') + getUserNameFromUser(user), game: GAME_NAME};
 	botMessage(to, already ? Phrases.alreadyWinner(data) : Phrases.winner(data));
 };
-var botMessage = function (to, message) {
+var botMessage = function (to, message, from_id) {
 	console.log(message);
 	bot.sendMessage(to, message, {
+		reply_to_message_id: from_id,
 		parse_mode: "HTML"
 	});
 };
@@ -206,7 +210,7 @@ var unregisterUser = function (dbRef, user, callback) {
 };
 // Matches /echo [whatever]
 bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {
-	var fromId = msg.from.id;
+	var fromId = msg.message_id;
 	var cmd = match[1];
 	var args = match[2];
 
@@ -218,3 +222,7 @@ bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {
 bot.getMe().then(function (me) {
 	console.log('Hi my name is %s!', me.username);
 });
+//
+// bot.getUpdates().then(function (data) {
+// 	console.log(data);
+// });

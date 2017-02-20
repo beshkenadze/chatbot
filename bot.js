@@ -65,7 +65,9 @@ var commandSignal = new machina.Fsm({
 				});
 			},
 			"hello": function (msg) {
-				console.log(msg);
+				botMessage(msg.chat.id, "Ты! У твоих тимлидов есть живые джуниоры? \n\
+     — Сэр, да, сэр!\n\
+     — Готов поспорить, они об этом жалеют! Ты такой говнокодер, что мог бы стать шедевром современного программирования.");
 			},
 			"quote": function (msg) {
 				var user = msg.from;

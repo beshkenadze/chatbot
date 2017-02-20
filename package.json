@@ -5,7 +5,8 @@
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bot.js"
+    "start": "node bot.js",
+    "publish": "docker build -t beshkenadze/govnokoder . && docker push beshkenadze/govnokoder:latest"
   },
   "repository": {
     "type": "git",

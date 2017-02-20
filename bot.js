@@ -6,7 +6,7 @@ var botToken = process.env.BOT_TOKEN || 'some-default-token';
 var firebaseApiKey = process.env.FIREBASE_API_KEY || 'some-default-key';
 var firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'some-default-project-id';
 var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';
-;
+
 // Setup polling way
 var bot = new TelegramBot(botToken, {
 	polling: true
@@ -62,13 +62,17 @@ var commandSignal = new machina.Fsm({
 			"count": function (msg) {
 				bot.getChatMembersCount(msg.chat.id).then(function (count) {
 					console.log("Total users %d", count);
-
 				});
 			},
 			"hello": function (msg) {
 				console.log(msg);
 			},
+			"quote": function (msg) {
+				var user = msg.from;
+				botMessage(msg.chat.id, Phrases.getRandomQuote(getUserNameFromUser(user)))
+			},
 			"round": function (msg) {
+				this.handle('quote', msg);
 				findTodayWinner(function (winner) {
 					if (winner === null) {
 						usersRef.once("value", function (snapshot) {
@@ -165,10 +169,16 @@ var winnerMessage = function (to, user, already) {
 };
 var botMessage = function (to, message, from_id) {
 	console.log(message);
-	bot.sendMessage(to, message, {
-		reply_to_message_id: from_id,
+
+	var messageData = {
 		parse_mode: "HTML"
-	});
+	};
+
+	if (from_id && from_id > 0) {
+		messageData['reply_to_message_id'] = from_id;
+	}
+
+	bot.sendMessage(to, message, messageData);
 };
 var findUser = function (dbRef, user, callback) {
 	if (typeof callback === "undefined") {

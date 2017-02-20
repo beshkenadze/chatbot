@@ -16,6 +16,9 @@ module.exports = {
 		}
 		return '';
 	},
+	getRandomQuote: function (object) {
+		return this.getString('quotes', object);
+	},
 	getString: function (key, object) {
 		var template = this.getRandomTemplate(key);
 		if (typeof template !== 'string') {

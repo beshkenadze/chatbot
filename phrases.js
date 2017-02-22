@@ -1,18 +1,18 @@
-yaml = require('js-yaml');
-sprintf = require('sprintf');
-fs = require('fs');
-
-// Get document, or throw exception on error
-try {
-	var doc = yaml.safeLoad(fs.readFileSync('phrases.yml', 'utf8'));
-} catch (e) {
-	console.log(e);
-}
+var sprintf = require('sprintf'),
+  phrases = require('./phrases.json'),
+  fs = require('fs');
 
 module.exports = {
+	prevRandom: -1,
 	getRandomTemplate: function (key) {
-		if (key in doc) {
-			return doc[key][Math.floor(Math.random() * doc[key].length)];
+		if (key in phrases) {
+			var index = Math.floor(Math.random() * phrases[key].length);
+			if (this.prevRandom !== index) {
+				this.prevRandom = index;
+			}else {
+				return this.getRandomTemplate(key);
+			}
+			return phrases[key][index];
 		}
 		return '';
 	},

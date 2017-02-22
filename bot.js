@@ -69,9 +69,9 @@ var commandSignal = new machina.Fsm({
      — Сэр, да, сэр!\n\
      — Готов поспорить, они об этом жалеют! Ты такой говнокодер, что мог бы стать шедевром современного программирования.");
 			},
-			"quote": function (msg) {
+			"quote": function (msg, id) {
 				var user = msg.from;
-				botMessage(msg.chat.id, Phrases.getRandomQuote(getUserNameFromUser(user)))
+				botMessage(msg.chat.id, Phrases.getQuote(getUserNameFromUser(user), id));
 			},
 			"round": function (msg) {
 				this.handle('quote', msg);
@@ -161,8 +161,8 @@ var commandSignal = new machina.Fsm({
 
 		},
 	},
-	cmd: function (cmd, args) {
-		this.handle(args, cmd);
+	cmd: function (cmd, msg, args) {
+		this.handle(msg, cmd, args);
 	}
 });
 var winnerMessage = function (to, user, already) {
@@ -228,7 +228,7 @@ bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {
 
 	console.log("cmd: %s, args: %s", cmd, args);
 	// console.log(msg);
-	commandSignal.handle(cmd, msg);
+	commandSignal.handle(cmd, msg, args);
 });
 
 bot.getMe().then(function (me) {

@@ -4,23 +4,29 @@ var sprintf = require('sprintf'),
 
 module.exports = {
 	prevRandom: -1,
-	getRandomTemplate: function (key) {
+	getRandomTemplate: function (key, id) {
+		var index = id || -1;
 		if (key in phrases) {
-			var index = Math.floor(Math.random() * phrases[key].length);
-			if (this.prevRandom !== index) {
-				this.prevRandom = index;
-			}else {
-				return this.getRandomTemplate(key);
+			if (index >= 0) {
+				return '#' + index + '\n' + phrases[key][index];
 			}
-			return phrases[key][index];
+			index = Math.floor(Math.random() * phrases[key].length);
+
+			if (this.prevRandom === index) {
+				return this.getRandomTemplate(key);
+			} else {
+				this.prevRandom = index;
+			}
+
+			return '#' + index + '\n' + phrases[key][index];
 		}
 		return '';
 	},
-	getRandomQuote: function (object) {
-		return this.getString('quotes', object);
+	getQuote: function (object, id) {
+		return this.getString('quotes', object, id);
 	},
-	getString: function (key, object) {
-		var template = this.getRandomTemplate(key);
+	getString: function (key, object, id) {
+		var template = this.getRandomTemplate(key, id);
 		if (typeof template !== 'string') {
 			for (var i = 0; i < template.length; i++) {
 				try {

@@ -6,7 +6,7 @@ var botToken = process.env.BOT_TOKEN || 'some-default-token';
 var firebaseApiKey = process.env.FIREBASE_API_KEY || 'some-default-key';
 var firebaseProjectId = process.env.FIREBASE_PROJECT_ID || 'some-default-project-id';
 var GAME_NAME = process.env.GAME_NAME || 'some-default-project-name';
-
+var BOT_USER_NAME = "bot_name";
 // Setup polling way
 var bot = new TelegramBot(botToken, {
 	polling: true
@@ -224,7 +224,7 @@ var unregisterUser = function (dbRef, user, callback) {
 bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {
 	var fromId = msg.message_id;
 	var cmd = match[1];
-	var args = match[2];
+	var args = match[2].replace('@' + BOT_USER_NAME + ' ', '');
 
 	console.log("cmd: %s, args: %s", cmd, args);
 	// console.log(msg);
@@ -233,6 +233,7 @@ bot.onText(/\/(\w+) ?(.*)/, function (msg, match) {
 
 bot.getMe().then(function (me) {
 	console.log('Hi my name is %s!', me.username);
+	BOT_USER_NAME = me.username;
 });
 //
 // bot.getUpdates().then(function (data) {

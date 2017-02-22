@@ -13,6 +13,7 @@ module.exports = {
 			index = Math.floor(Math.random() * phrases[key].length);
 
 			if (this.prevRandom === index) {
+				prevRandom = -1;
 				return this.getRandomTemplate(key);
 			} else {
 				this.prevRandom = index;
